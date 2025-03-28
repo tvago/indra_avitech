@@ -1,11 +1,14 @@
 package org.example.migration;
 
+import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 
 public class DatabaseMigration {
-	public static void migrate() {
+
+	public static void migrate(DataSource dataSource) {
 		Flyway flyway = Flyway.configure()
-							  .dataSource("jdbc:h2:mem:testdb", "sa", "")
+							  .dataSource(dataSource)
 							  .load();
 		flyway.migrate();
 	}
