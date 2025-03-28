@@ -2,15 +2,18 @@ package org.example.application.domain.service;
 
 import java.util.Set;
 
-import org.example.adapter.out.UserPersistenceAdapter;
 import org.example.application.domain.model.User;
 import org.example.application.port.in.PrintAllUsersUseCase;
+import org.example.application.port.out.UserRepository;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public class PrintAllUsersService implements PrintAllUsersUseCase {
-	private UserPersistenceAdapter userPersistenceAdapter;
+	private UserRepository userRepository;
 
 	@Override
 	public Set<User> findAllUsers() {
-		return userPersistenceAdapter.findAllUsers();
+		return userRepository.findAllUsers();
 	}
 }
