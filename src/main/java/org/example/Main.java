@@ -40,25 +40,24 @@ public class Main {
 		//  producer and consumer initialization
 		CommandProducerService commandProducerService = new CommandProducerService(new LinkedBlockingQueue<>());
 		CommandExecutorService commandExecutor = new CommandExecutorService(commandProducerService.getQueue());
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		executor.submit(commandExecutor);
 
-		//  commands inserting into queue
-		commandProducerService.submit(new AddUserCommand(addUserService, new User(1, "a1", "Robert")));
-		commandProducerService.submit(new AddUserCommand(addUserService, new User(2, "a2", "Martin")));
-		commandProducerService.submit(new PrintAllUsersCommand(printAllUsersService));
-		commandProducerService.submit(new RemoveAllUsersCommand(removeAllUsersService));
-		commandProducerService.submit(new PrintAllUsersCommand(printAllUsersService));
-		commandProducerService.submit(new ShutDownCommand());
+		try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+			executor.submit(commandExecutor);
 
-		executor.shutdown();
-		try {
+			// enqueue commands
+			commandProducerService.submit(new AddUserCommand(addUserService, new User(1, "a1", "Robert")));
+			commandProducerService.submit(new AddUserCommand(addUserService, new User(2, "a2", "Martin")));
+			commandProducerService.submit(new PrintAllUsersCommand(printAllUsersService));
+			commandProducerService.submit(new RemoveAllUsersCommand(removeAllUsersService));
+			commandProducerService.submit(new PrintAllUsersCommand(printAllUsersService));
+			commandProducerService.submit(new ShutDownCommand());
+
+			// wait until all tasks are done
 			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			System.out.println("All the tasks processed successfully.");
+			System.out.println("All tasks processed successfully.");
 		} catch (InterruptedException e) {
-			executor.shutdownNow();
-			Thread.currentThread().interrupt();
 			System.err.println("Executor has been interrupted.");
+			Thread.currentThread().interrupt();
 		}
 	}
 }
